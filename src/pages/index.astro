@@ -1,0 +1,19 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { HomePage } from "../components/pages/home/page";
+
+export const prerender = true;
+---
+
+<Layout
+  title="QuickSales-POS | KRA eTIMS POS Software for Kenyan Businesses"
+  description="Run checkout, issue KRA eTIMS-compliant receipts, manage inventory, and track every branch with QuickSales-POS."
+  canonical="https://quicksalespos.com/"
+  image="/favicon/logo.png"
+  imageAlt="QuickSales-POS logo"
+>
+  <Fragment slot="head">
+    <meta name="keywords" content="POS system Kenya, KRA eTIMS POS, retail software Kenya, inventory management, multi-branch POS" />
+  </Fragment>
+  <HomePage client:load />
+</Layout>
