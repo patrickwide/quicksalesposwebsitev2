@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const revealVariants: Variants = {
-  hidden: { opacity: 1, y: 28 },
+  hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 1.4, ease } },
 };
 
