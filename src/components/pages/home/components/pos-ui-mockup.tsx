@@ -22,12 +22,11 @@ export type ViewportMode = "phone" | "tablet" | "desktop";
 type MobilePanel = "products" | "checkout";
 
 type PosUiMockupProps = {
-  /** Defaults to "desktop" so existing call sites that don't pick a mode still render correctly. */
-  viewport?: ViewportMode;
+  viewport: ViewportMode;
 };
 
 /** Front-end-only POS preview based on the supplied QuickSales product and checkout patterns. */
-export function PosUiMockup({ viewport = "desktop" }: PosUiMockupProps) {
+export function PosUiMockup({ viewport }: PosUiMockupProps) {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<Record<number, number>>({ 1: 2, 2: 1, 3: 1, 4: 1 });
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>("products");
@@ -178,7 +177,7 @@ export function PosUiMockup({ viewport = "desktop" }: PosUiMockupProps) {
   );
 
   return (
-    <div className={`pos-ui w-full overflow-hidden border border-ploy-border-primary bg-ploy-background-primary shadow-[0_24px_70px_rgba(15,23,42,0.12)] transition-[width,height,border-radius] duration-[450ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:duration-75 motion-reduce:ease-linear ${viewport === "phone" ? "h-[590px] max-w-[390px] rounded-[2rem]" : viewport === "tablet" ? "h-[500px] max-w-[620px] rounded-[1.5rem]" : "h-[430px] max-w-[720px] rounded-xl"}`}>
+    <div className={`pos-ui overflow-hidden border border-ploy-border-primary bg-ploy-background-primary shadow-[0_24px_70px_rgba(15,23,42,0.12)] transition-[width,height,border-radius] duration-[450ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:duration-75 motion-reduce:ease-linear ${viewport === "phone" ? "h-[590px] w-[390px] max-w-full rounded-[2rem]" : viewport === "tablet" ? "h-[500px] w-[620px] max-w-full rounded-[1.5rem]" : "h-[430px] w-[720px] max-w-full rounded-xl"}`}>
       <div className="pos-ui__topbar flex h-12 items-center justify-between gap-3 border-b border-ploy-border-primary px-3 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">
           <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-ploy-accent-primary" />
