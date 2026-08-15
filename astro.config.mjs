@@ -4,9 +4,14 @@ import { fileURLToPath } from "node:url";
 import { defineConfig, sessionDrivers } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import cloudflare from "@astrojs/cloudflare";
+import vercel from "@astrojs/vercel";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import { sitemapWithCustomPages } from "./src/lib/sitemap/sitemap-with-custom-pages-plugin.ts";
+
+// Vercel sets this automatically in its own build environment. Use it to pick
+// the right adapter without touching the Cloudflare/Ploy deploy path.
+const isVercel = !!process.env.VERCEL;
 
 // Ploy generates the wrangler config at deploy time; it isn't checked in. Only
 // pass configPath to the Cloudflare adapter when one of the supported wrangler
@@ -41,10 +46,12 @@ export default defineConfig({
     // WELL_KNOWN_ASSET_ROUTES in ploy-world.
     assets: "_ploy_static/_astro",
   },
-  adapter: cloudflare({
-    imageService: "compile",
-    ...(wranglerConfig && { configPath: wranglerConfig }),
-  }),
+  adapter: isVercel
+    ? vercel()
+    : cloudflare({
+        imageService: "compile",
+        ...(wranglerConfig && { configPath: wranglerConfig }),
+      }),
   integrations: [
     mdx(),
     react(),
@@ -57,18 +64,23 @@ export default defineConfig({
     resolve: {
       // Use react-dom/server.edge instead of react-dom/server.browser for React 19.
       // Without this, MessageChannel from node:worker_threads needs to be polyfilled.
-      alias: import.meta.env.PROD
-        ? { "react-dom/server": "react-dom/server.edge" }
-        : undefined,
+      // Only needed on the Cloudflare/workerd runtime — Vercel's Node runtime
+      // doesn't need this alias.
+      alias:
+        import.meta.env.PROD && !isVercel
+          ? { "react-dom/server": "react-dom/server.edge" }
+          : undefined,
     },
     ssr: {
       noExternal: ["xxhash-wasm"],
-      ...(import.meta.env.PROD && {
-        resolve: {
-          conditions: ["workerd", "worker", "node"],
-          externalConditions: ["workerd", "worker", "node"],
-        },
-      }),
+      // workerd-specific resolve conditions — only apply for the Cloudflare build.
+      ...(import.meta.env.PROD &&
+        !isVercel && {
+          resolve: {
+            conditions: ["workerd", "worker", "node"],
+            externalConditions: ["workerd", "worker", "node"],
+          },
+        }),
     },
     server: {
       strictPort: true,
